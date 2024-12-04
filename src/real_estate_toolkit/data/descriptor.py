@@ -1,200 +1,250 @@
 from dataclasses import dataclass
-from typing import Any, Dict, List, Tuple, Union
-import statistics
+from typing import Dict, List, Tuple, Any, Union
 
 @dataclass
 class Descriptor:
-    """Class for summarizing and describing real estate data."""
-    data: List[Dict[str, Any]]
+    data: List[Dict[str, Any]]  #type hint
 
-    def none_ratio(self, columns: Union[List[str], str] = "all") -> Dict[str, float]:
-        """Compute the ratio of None value per column.
-        If columns = "all" then compute for all.
-        Validate that column names are correct. If not make an exception.
-        Return a dictionary with the key as the variable name and value as the ratio.
-        """
+
+
+#3.1 noneRatio
+    def none_ratio(self, columns: List[str] = "all"):   #default value, but "all" is not a List of str?
         if columns == "all":
             columns = list(self.data[0].keys())
-        
-        result = {}
+
+        noneRatioResult = {}
+
+        for column in columns:  #cols are keys
+            if column not in self.data[0]:
+                raise ValueError(f"Oops!  {column} was no valid column.  Try again...")
+
+            noneCount = 0
+            for row in self.data:   #rows are values
+                if row[column] is None:
+                    noneCount += 1
+            noneRatioResult[column] = noneCount / len(self.data)
+
+        return noneRatioResult # type: ignore
+
+
+
+#3.2 avg
+    def average(self, columns: List[str] = "all") -> Dict[str, float]:
+        if columns == "all":
+            columns = [key for key in self.data[0].keys() if isinstance(self.data[0][key],
+                                                                        (int, float))]   #no mg. complex?
+
+        avgResult = {}
+
         for column in columns:
             if column not in self.data[0]:
-                raise ValueError(f"Column {column} does not exist in the data.")
-            none_count = sum(1 for row in self.data if row[column] is None)
-            result[column] = none_count / len(self.data)
-        return result # type: ignore
-    
-    def average(self, columns: Union[List[str], str] = "all") -> Dict[str, float]:
-        """Compute the average value for numeric variables. Omit None values.
-        If columns = "all" then compute for all numeric ones.
-        Validate that column names are correct and correspond to a numeric variable. If not make an exception.
-        Return a dictionary with the key as the numeric variable name and value as the average
-        """
+                raise ValueError(f"Oops!  {column} was no valid column.  Try again...")
+            elif not isinstance(self.data[0][column],
+                                (int, float)):
+                raise ValueError(f"Oops!  {column} was no valid NUMERIC column.  Try again...")
+
+            values = [row[column] for row in self.data if row[column] is not None]  #no mg list comprehension.
+            avgResult[column] = sum(values) / len(values) if values else None
+
+        return avgResult # type: ignore
+
+
+
+#3.3 mdn
+    def median(self, columns: List[str] = "all") -> Dict[str, float]:
+        import statistics
+
         if columns == "all":
-            columns = [key for key in self.data[0].keys() if isinstance(self.data[0][key], (int, float))]
-        
-        result = {}
+            columns = [key for key in self.data[0].keys() if isinstance(self.data[0][key],
+                                                                        (int, float))]
+
+        mdnResult = {}
+
         for column in columns:
-            if column not in self.data[0] or not isinstance(self.data[0][column], (int, float)):
-                raise ValueError(f"Column {column} is not a numeric variable.")
+            if column not in self.data[0]:
+                raise ValueError(f"Oops!  {column} was no valid column.  Try again...")
+            elif not isinstance(self.data[0][column],
+                                (int, float)):
+                raise ValueError(f"Oops!  {column} was no valid NUMERIC column.  Try again...")
+
             values = [row[column] for row in self.data if row[column] is not None]
-            result[column] = sum(values) / len(values) if values else None
-        return result # type: ignore
-    
-    def median(self, columns: Union[List[str], str] = "all") -> Dict[str, float]:
-        """Compute the median value for numeric variables. Omit None values.
-        If columns = "all" then compute for all numeric ones.
-        Validate that column names are correct and correspond to a numeric variable. If not make an exception.
-        Return a dictionary with the key as the numeric variable name and value as the median
-        """
+            mdnResult[column] = statistics.median(values) if values else None
+
+        return mdnResult # type: ignore
+
+
+
+#3.4 pctl
+    def percentile(self, columns: List[str] = "all", percentile: int = 50) -> Dict[str, float]:
+        import statistics
+
         if columns == "all":
-            columns = [key for key in self.data[0].keys() if isinstance(self.data[0][key], (int, float))]
-        
-        result = {}
+            columns = [key for key in self.data[0].keys() if isinstance(self.data[0][key],
+                                                                        (int, float))]
+
+        pctlResult = {}
+
         for column in columns:
-            if column not in self.data[0] or not isinstance(self.data[0][column], (int, float)):
-                raise ValueError(f"Column {column} is not a numeric variable.")
+            if column not in self.data[0]:
+                raise ValueError(f"Oops!  {column} was no valid column.  Try again...")
+            elif not isinstance(self.data[0][column],
+                                (int, float)):
+                raise ValueError(f"Oops!  {column} was no valid NUMERIC column.  Try again...")
+
             values = [row[column] for row in self.data if row[column] is not None]
-            result[column] = statistics.median(values) if values else None
-        return result # type: ignore
-    
-    def percentile(self, columns: Union[List[str], str] = "all", percentile: int = 50) -> Dict[str, float]:
-        """Compute the percentile value for numeric variables. Omit None values.
-        If columns = "all" then compute for all numeric ones.
-        Validate that column names are correct and correspond to a numeric variable. If not make an exception.
-        Return a dictionary with the key as the numeric variable name and value as the percentile
-        """
-        if columns == "all":
-            columns = [key for key in self.data[0].keys() if isinstance(self.data[0][key], (int, float))]
-        
-        result = {}
-        for column in columns:
-            if column not in self.data[0] or not isinstance(self.data[0][column], (int, float)):
-                raise ValueError(f"Column {column} is not a numeric variable.")
-            values = [row[column] for row in self.data if row[column] is not None]
-            result[column] = statistics.quantiles(values, n=100)[percentile-1] if values else None
-        return result # type: ignore
-    
+            pctlResult[column] = statistics.quantiles(values, n=100)[percentile-1] if values else None
+
+        return pctlResult # type: ignore
+
+
+
+#3.5 typeMode
     def type_and_mode(self, columns: Union[List[str], str] = "all") -> Dict[str, Tuple[str, Union[float, str, None]]]:
-        """Compute the mode for variables. Omit None values.
-        If columns = "all" then compute for all.
-        Validate that column names are correct. If not make an exception.
-        Return a dictionary with the key as the variable name and value as a tuple of the variable type and the mode.
-        If the variable is categorical
-        """
+        import statistics
+
         if columns == "all":
             columns = list(self.data[0].keys())
-        
-        result = {}
+
+        typeModeResult = {}
+
         for column in columns:
             if column not in self.data[0]:
-                raise ValueError(f"Column {column} does not exist in the data.")
+                raise ValueError(f"Oops!  {column} was no valid column.  Try again...")
+
+
+
             values = [row[column] for row in self.data if row[column] is not None]
             if not values:
-                result[column] = (type(self.data[0][column]).__name__, None)
+                typeModeResult[column] = (type(self.data[0][column]).__name__, None)    #__name__
             elif isinstance(values[0], (int, float)):
-                result[column] = (type(values[0]).__name__, statistics.mode(values))
+                typeModeResult[column] = (type(values[0]).__name__, statistics.mode(values))
             else:
-                result[column] = (type(values[0]).__name__, statistics.mode(values))
-        return result # type: ignore
-    
-    from dataclasses import dataclass
-from typing import Any, Dict, List, Union
+                typeModeResult[column] = (type(values[0]).__name__, statistics.mode(values))
+
+        return typeModeResult # type: ignore
+
+
+
+
+
+
+
+#4. NumPy
 import numpy as np
 
 @dataclass
 class DescriptorNumpy:
-    """Class for summarizing and describing real estate data using NumPy."""
     data: List[Dict[str, Any]]
 
-    def none_ratio(self, columns: Union[List[str], str] = "all") -> Dict[str, float]:
-        """Compute the ratio of None value per column using NumPy.
-        If columns = "all" then compute for all.
-        Validate that column names are correct. If not make an exception.
-        Return a dictionary with the key as the variable name and value as the ratio.
-        """
+
+
+#4.1
+    def none_ratio(self, columns: List[str] = "all"):
         if columns == "all":
             columns = list(self.data[0].keys())
-        
-        result = {}
+
+        noneRatioResult = {}
+
         for column in columns:
             if column not in self.data[0]:
-                raise ValueError(f"Column {column} does not exist in the data.")
+                raise ValueError(f"Oops!  {column} was no valid column.  Try again...")
+
+            #NumPy
             values = np.array([row[column] for row in self.data])
-            none_count = np.sum(values == None)
-            result[column] = none_count / len(self.data)
-        return result # type: ignore
-    
-    def average(self, columns: Union[List[str], str] = "all") -> Dict[str, float]:
-        """Compute the average value for numeric variables using NumPy. Omit None values.
-        If columns = "all" then compute for all numeric ones.
-        Validate that column names are correct and correspond to a numeric variable. If not make an exception.
-        Return a dictionary with the key as the numeric variable name and value as the average
-        """
+            noneCount = np.sum(values == None)
+            noneRatioResult[column] = noneCount / len(self.data)
+
+        return noneRatioResult # type: ignore
+
+
+
+#4.2
+    def average(self, columns: List[str] = "all") -> Dict[str, float]:
         if columns == "all":
-            columns = [key for key in self.data[0].keys() if isinstance(self.data[0][key], (int, float))]
-        
-        result = {}
-        for column in columns:
-            if column not in self.data[0] or not isinstance(self.data[0][column], (int, float)):
-                raise ValueError(f"Column {column} is not a numeric variable.")
-            values = np.array([row[column] for row in self.data if row[column] is not None])
-            result[column] = np.mean(values) if values.size > 0 else None
-        return result # type: ignore
-    
-    def median(self, columns: Union[List[str], str] = "all") -> Dict[str, float]:
-        """Compute the median value for numeric variables using NumPy. Omit None values.
-        If columns = "all" then compute for all numeric ones.
-        Validate that column names are correct and correspond to a numeric variable. If not make an exception.
-        Return a dictionary with the key as the numeric variable name and value as the median
-        """
-        if columns == "all":
-            columns = [key for key in self.data[0].keys() if isinstance(self.data[0][key], (int, float))]
-        
-        result = {}
-        for column in columns:
-            if column not in self.data[0] or not isinstance(self.data[0][column], (int, float)):
-                raise ValueError(f"Column {column} is not a numeric variable.")
-            values = np.array([row[column] for row in self.data if row[column] is not None])
-            result[column] = np.median(values) if values.size > 0 else None
-        return result # type: ignore
-    
-    def percentile(self, columns: Union[List[str], str] = "all", percentile: int = 50) -> Dict[str, float]:
-        """Compute the percentile value for numeric variables using NumPy. Omit None values.
-        If columns = "all" then compute for all numeric ones.
-        Validate that column names are correct and correspond to a numeric variable. If not make an exception.
-        Return a dictionary with the key as the numeric variable name and value as the percentile
-        """
-        if columns == "all":
-            columns = [key for key in self.data[0].keys() if isinstance(self.data[0][key], (int, float))]
-        
-        result = {}
-        for column in columns:
-            if column not in self.data[0] or not isinstance(self.data[0][column], (int, float)):
-                raise ValueError(f"Column {column} is not a numeric variable.")
-            values = np.array([row[column] for row in self.data if row[column] is not None])
-            result[column] = np.percentile(values, percentile) if values.size > 0 else None
-        return result # type: ignore
-    
-    def type_and_mode(self, columns: Union[List[str], str] = "all") -> Dict[str, Union[Tuple[str, float], Tuple[str, str]]]:
-        """Compute the mode for variables using NumPy. Omit None values.
-        If columns = "all" then compute for all.
-        Validate that column names are correct. If not make an exception.
-        Return a dictionary with the key as the variable name and value as a tuple of the variable type and the mode.
-        If the variable is categorical
-        """
-        if columns == "all":
-            columns = list(self.data[0].keys())
-        
-        result = {}
+            columns = [key for key in self.data[0].keys() if isinstance(self.data[0][key],
+                                                                        (int, float))]
+
+        avgResult = {}
+
         for column in columns:
             if column not in self.data[0]:
-                raise ValueError(f"Column {column} does not exist in the data.")
+                raise ValueError(f"Oops!  {column} was no valid column.  Try again...")
+            elif not isinstance(self.data[0][column],
+                                (int, float)):
+                raise ValueError(f"Oops!  {column} was no valid NUMERIC column.  Try again...")
+
+            #NumPy
+            values = np.array([row[column] for row in self.data if row[column] is not None])
+            avgResult[column] = np.mean(values) if values.size > 0 else None
+
+        return avgResult # type: ignore
+
+
+
+#4.3
+    def median(self, columns: List[str] = "all") -> Dict[str, float]:
+        if columns == "all":
+            columns = [key for key in self.data[0].keys() if isinstance(self.data[0][key],
+                                                                        (int, float))]
+
+        mdnResult = {}
+
+        for column in columns:
+            if column not in self.data[0]:
+                raise ValueError(f"Oops!  {column} was no valid column.  Try again...")
+            elif not isinstance(self.data[0][column],
+                                (int, float)):
+                raise ValueError(f"Oops!  {column} was no valid NUMERIC column.  Try again...")
+
+            #NumPy
+            values = np.array([row[column] for row in self.data if row[column] is not None])
+            mdnResult[column] = np.median(values) if values.size > 0 else None
+
+        return mdnResult # type: ignore
+
+
+
+#4.4
+    def percentile(self, columns: List[str] = "all", percentile: int = 50) -> Dict[str, float]:
+        if columns == "all":
+            columns = [key for key in self.data[0].keys() if isinstance(self.data[0][key],
+                                                                        (int, float))]
+
+        pctlResult = {}
+
+        for column in columns:
+            if column not in self.data[0]:
+                raise ValueError(f"Oops!  {column} was no valid column.  Try again...")
+            elif not isinstance(self.data[0][column],
+                                (int, float)):
+                raise ValueError(f"Oops!  {column} was no valid NUMERIC column.  Try again...")
+
+            #NumPy
+            values = np.array([row[column] for row in self.data if row[column] is not None])
+            pctlResult[column] = np.percentile(values, percentile) if values.size > 0 else None
+
+        return pctlResult # type: ignore
+
+
+
+#4.5
+    def type_and_mode(self, columns: Union[List[str], str] = "all") -> Dict[str, Tuple[str, Union[float, str, None]]]:
+        if columns == "all":
+            columns = list(self.data[0].keys())
+
+        typeModeResult = {}
+
+        for column in columns:
+            if column not in self.data[0]:
+                raise ValueError(f"Oops!  {column} was no valid column.  Try again...")
+
+            #NumPy
             values = np.array([row[column] for row in self.data if row[column] is not None])
             if values.size == 0:
-                result[column] = (type(self.data[0][column]).__name__, None)
+                typeModeResult[column] = (type(self.data[0][column]).__name__, None)
             elif np.issubdtype(values.dtype, np.number):
-                result[column] = (type(values[0]).__name__, float(np.bincount(values).argmax()))
+                typeModeResult[column] = (type(values[0]).__name__, float(np.bincount(values).argmax()))
             else:
-                result[column] = (type(values[0]).__name__, str(np.bincount(values).argmax()))
+                typeModeResult[column] = (type(values[0]).__name__, str(np.bincount(values).argmax()))
+
         return result # type: ignore
