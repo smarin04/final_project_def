@@ -6,7 +6,7 @@ class Descriptor:
     data: List[Dict[str, Any]]
 
 #noneRatio
-    def none_ratio(self, columns: List[str] = "all"):
+    def none_ratio(self, columns: Union[List[str], str] = "all"):
         if columns == "all":
             columns = list(self.data[0].keys())
 
@@ -27,7 +27,7 @@ class Descriptor:
         return noneRatioResult
 
 #avg
-    def average(self, columns: List[str] = "all") -> Dict[str, float]:
+    def average(self, columns: Union[List[str], str] = "all") -> Dict[str, float]:
         if columns == "all":
             columns = [key for key in self.data[0].keys() if isinstance(self.data[0][key],
                                                                         (int, float))]
@@ -47,7 +47,7 @@ class Descriptor:
         return avgResult
 
 #mdn
-    def median(self, columns: List[str] = "all") -> Dict[str, float]:
+    def median(self, columns: Union[List[str], str] = "all") -> Dict[str, float]:
         import statistics
 
         if columns == "all":
@@ -69,7 +69,7 @@ class Descriptor:
         return mdnResult
 
 #pctl
-    def percentile(self, columns: List[str] = "all", percentile: int = 50) -> Dict[str, float]:
+    def percentile(self, columns: Union[List[str], str] = "all", percentile: int = 50) -> Dict[str, float]:
         import statistics
 
         if columns == "all":
@@ -92,8 +92,8 @@ class Descriptor:
 
 #typeMode
     def type_and_mode(self, columns: Union[List[str], str] = "all") -> Dict[str,
-                                                                            Tuple[str,
-                                                                                  Union[float, str, None]]]:
+                                                                            Union[Tuple[str, float],
+                                                                                  Tuple[str, str]]]:
         import statistics
 
         if columns == "all":
@@ -128,7 +128,7 @@ class DescriptorNumpy:
     data: List[Dict[str, Any]]
 
 #1
-    def none_ratio(self, columns: List[str] = "all"):
+    def none_ratio(self, columns: Union[List[str], str] = "all"):
         if columns == "all":
             columns = list(self.data[0].keys())
 
@@ -146,7 +146,7 @@ class DescriptorNumpy:
         return noneRatioResultNp
 
 #2
-    def average(self, columns: List[str] = "all") -> Dict[str, float]:
+    def average(self, columns: Union[List[str], str] = "all") -> Dict[str, float]:
         if columns == "all":
             columns = [key for key in self.data[0].keys() if isinstance(self.data[0][key],
                                                                         (int, float))]
@@ -167,7 +167,7 @@ class DescriptorNumpy:
         return avgResultNp
 
 #3
-    def median(self, columns: List[str] = "all") -> Dict[str, float]:
+    def median(self, columns: Union[List[str], str] = "all") -> Dict[str, float]:
         if columns == "all":
             columns = [key for key in self.data[0].keys() if isinstance(self.data[0][key],
                                                                         (int, float))]
@@ -188,7 +188,7 @@ class DescriptorNumpy:
         return mdnResultNp
 
 #4
-    def percentile(self, columns: List[str] = "all", percentile: int = 50) -> Dict[str, float]:
+    def percentile(self, columns: Union[List[str], str] = "all", percentile: int = 50) -> Dict[str, float]:
         if columns == "all":
             columns = [key for key in self.data[0].keys() if isinstance(self.data[0][key],
                                                                         (int, float))]
@@ -210,8 +210,8 @@ class DescriptorNumpy:
 
 #5
     def type_and_mode(self, columns: Union[List[str], str] = "all") -> Dict[str,
-                                                                            Tuple[str,
-                                                                                  Union[float, str, None]]]:
+                                                                            Union[Tuple[str, float],
+                                                                                  Tuple[str, str]]]:
         if columns == "all":
             columns = list(self.data[0].keys())
 

@@ -1,6 +1,6 @@
 from enum import Enum
 from dataclasses import dataclass
-from typing import Optional, List, Dict
+from typing import Optional
 
 class QualityScore(Enum):
     EXCELLENT = 5
@@ -29,7 +29,7 @@ class House:
 
 #2
     from datetime import datetime
-    def is_new_construction(self, current_year: int = datetime.now().year) -> bool: #
+    def is_new_construction(self, current_year: int = datetime.now().year) -> bool:
         newConstruction = (current_year - self.year_built) < 5
         return newConstruction
 
@@ -39,7 +39,7 @@ class House:
 
         if self.quality_score is None:
             age = datetime.now().year - self.year_built
-            if age < 0 and self.area > 0 and self.bedrooms >= 0:                 #!
+            if age < 0 and self.area > 0 and self.bedrooms >= 0:                    #!
                 self.quality_score = QualityScore.EXCELLENT
             elif age < 0 and self.area > 0 and self.bedrooms >= 0:
                 self.quality_score = QualityScore.GOOD

@@ -1,6 +1,6 @@
 from enum import Enum, auto
 from dataclasses import dataclass
-from typing import Optional, List, Dict
+from typing import Optional
 from real_estate_toolkit.agent_based_model.houses import House, QualityScore                #!
 from real_estate_toolkit.agent_based_model.house_market import HousingMarket                #!
 
@@ -24,6 +24,8 @@ class Consumer:
         for year in range(years):
             self.savings += self.annual_income * self.saving_rate
             self.savings *= (1 + self.interest_rate)
+
+        self.savings = round(self.savings, 2)
 
     def buy_a_house(self, housing_market: HousingMarket) -> None:
         suitableHouses = []

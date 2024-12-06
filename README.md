@@ -34,7 +34,7 @@ exit
 ### consumers.py
 - [x] ~~`consumer.savings`~~ or ~~`is None`~~ (main.py)
 
-`initial_savings` or `is not None`.
+~~`initial_savings` or `is not None`.~~
 
 ### simulation.py
 
