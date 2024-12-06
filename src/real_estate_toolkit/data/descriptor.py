@@ -3,36 +3,34 @@ from typing import Dict, List, Tuple, Any, Union
 
 @dataclass
 class Descriptor:
-    data: List[Dict[str, Any]]  #type hint
+    data: List[Dict[str, Any]]
 
-
-
-#3.1 noneRatio
-    def none_ratio(self, columns: List[str] = "all"):   #default value, but "all" is not a List of str?
+#noneRatio
+    def none_ratio(self, columns: List[str] = "all"):
         if columns == "all":
             columns = list(self.data[0].keys())
 
         noneRatioResult = {}
 
-        for column in columns:  #cols are keys
+        #Cols are Keys
+        for column in columns:
             if column not in self.data[0]:
                 raise ValueError(f"Oops!  {column} was no valid column.  Try again...")
 
             noneCount = 0
-            for row in self.data:   #rows are values
+            #Rows are Values
+            for row in self.data:
                 if row[column] is None:
                     noneCount += 1
             noneRatioResult[column] = noneCount / len(self.data)
 
-        return noneRatioResult # type: ignore
+        return noneRatioResult
 
-
-
-#3.2 avg
+#avg
     def average(self, columns: List[str] = "all") -> Dict[str, float]:
         if columns == "all":
             columns = [key for key in self.data[0].keys() if isinstance(self.data[0][key],
-                                                                        (int, float))]   #no mg. complex?
+                                                                        (int, float))]
 
         avgResult = {}
 
@@ -43,14 +41,12 @@ class Descriptor:
                                 (int, float)):
                 raise ValueError(f"Oops!  {column} was no valid NUMERIC column.  Try again...")
 
-            values = [row[column] for row in self.data if row[column] is not None]  #no mg list comprehension.
+            values = [row[column] for row in self.data if row[column] is not None]
             avgResult[column] = sum(values) / len(values) if values else None
 
-        return avgResult # type: ignore
+        return avgResult
 
-
-
-#3.3 mdn
+#mdn
     def median(self, columns: List[str] = "all") -> Dict[str, float]:
         import statistics
 
@@ -70,11 +66,9 @@ class Descriptor:
             values = [row[column] for row in self.data if row[column] is not None]
             mdnResult[column] = statistics.median(values) if values else None
 
-        return mdnResult # type: ignore
+        return mdnResult
 
-
-
-#3.4 pctl
+#pctl
     def percentile(self, columns: List[str] = "all", percentile: int = 50) -> Dict[str, float]:
         import statistics
 
@@ -92,14 +86,14 @@ class Descriptor:
                 raise ValueError(f"Oops!  {column} was no valid NUMERIC column.  Try again...")
 
             values = [row[column] for row in self.data if row[column] is not None]
-            pctlResult[column] = statistics.quantiles(values, n=100)[percentile-1] if values else None
+            pctlResult[column] = statistics.quantiles(values, n=100, method="inclusive")[percentile-1] if values else None
 
-        return pctlResult # type: ignore
+        return pctlResult
 
-
-
-#3.5 typeMode
-    def type_and_mode(self, columns: Union[List[str], str] = "all") -> Dict[str, Tuple[str, Union[float, str, None]]]:
+#typeMode
+    def type_and_mode(self, columns: Union[List[str], str] = "all") -> Dict[str,
+                                                                            Tuple[str,
+                                                                                  Union[float, str, None]]]:
         import statistics
 
         if columns == "all":
@@ -115,35 +109,30 @@ class Descriptor:
 
             values = [row[column] for row in self.data if row[column] is not None]
             if not values:
-                typeModeResult[column] = (type(self.data[0][column]).__name__, None)    #__name__
+                #__name__
+                typeModeResult[column] = (type(self.data[0][column]).__name__, None)
             elif isinstance(values[0], (int, float)):
                 typeModeResult[column] = (type(values[0]).__name__, statistics.mode(values))
             else:
                 typeModeResult[column] = (type(values[0]).__name__, statistics.mode(values))
 
-        return typeModeResult # type: ignore
+        return typeModeResult
 
 
 
-
-
-
-
-#4. NumPy
+#NumPy
 import numpy as np
 
 @dataclass
 class DescriptorNumpy:
     data: List[Dict[str, Any]]
 
-
-
-#4.1
+#1
     def none_ratio(self, columns: List[str] = "all"):
         if columns == "all":
             columns = list(self.data[0].keys())
 
-        noneRatioResult = {}
+        noneRatioResultNp = {}
 
         for column in columns:
             if column not in self.data[0]:
@@ -152,19 +141,17 @@ class DescriptorNumpy:
             #NumPy
             values = np.array([row[column] for row in self.data])
             noneCount = np.sum(values == None)
-            noneRatioResult[column] = noneCount / len(self.data)
+            noneRatioResultNp[column] = noneCount / len(self.data)
 
-        return noneRatioResult # type: ignore
+        return noneRatioResultNp
 
-
-
-#4.2
+#2
     def average(self, columns: List[str] = "all") -> Dict[str, float]:
         if columns == "all":
             columns = [key for key in self.data[0].keys() if isinstance(self.data[0][key],
                                                                         (int, float))]
 
-        avgResult = {}
+        avgResultNp = {}
 
         for column in columns:
             if column not in self.data[0]:
@@ -175,19 +162,17 @@ class DescriptorNumpy:
 
             #NumPy
             values = np.array([row[column] for row in self.data if row[column] is not None])
-            avgResult[column] = np.mean(values) if values.size > 0 else None
+            avgResultNp[column] = np.mean(values) if values.size > 0 else None
 
-        return avgResult # type: ignore
+        return avgResultNp
 
-
-
-#4.3
+#3
     def median(self, columns: List[str] = "all") -> Dict[str, float]:
         if columns == "all":
             columns = [key for key in self.data[0].keys() if isinstance(self.data[0][key],
                                                                         (int, float))]
 
-        mdnResult = {}
+        mdnResultNp = {}
 
         for column in columns:
             if column not in self.data[0]:
@@ -198,19 +183,17 @@ class DescriptorNumpy:
 
             #NumPy
             values = np.array([row[column] for row in self.data if row[column] is not None])
-            mdnResult[column] = np.median(values) if values.size > 0 else None
+            mdnResultNp[column] = np.median(values) if values.size > 0 else None
 
-        return mdnResult # type: ignore
+        return mdnResultNp
 
-
-
-#4.4
+#4
     def percentile(self, columns: List[str] = "all", percentile: int = 50) -> Dict[str, float]:
         if columns == "all":
             columns = [key for key in self.data[0].keys() if isinstance(self.data[0][key],
                                                                         (int, float))]
 
-        pctlResult = {}
+        pctlResultNp = {}
 
         for column in columns:
             if column not in self.data[0]:
@@ -221,18 +204,18 @@ class DescriptorNumpy:
 
             #NumPy
             values = np.array([row[column] for row in self.data if row[column] is not None])
-            pctlResult[column] = np.percentile(values, percentile) if values.size > 0 else None
+            pctlResultNp[column] = np.percentile(values, percentile) if values.size > 0 else None
 
-        return pctlResult # type: ignore
+        return pctlResultNp
 
-
-
-#4.5
-    def type_and_mode(self, columns: Union[List[str], str] = "all") -> Dict[str, Tuple[str, Union[float, str, None]]]:
+#5
+    def type_and_mode(self, columns: Union[List[str], str] = "all") -> Dict[str,
+                                                                            Tuple[str,
+                                                                                  Union[float, str, None]]]:
         if columns == "all":
             columns = list(self.data[0].keys())
 
-        typeModeResult = {}
+        typeModeResultNp = {}
 
         for column in columns:
             if column not in self.data[0]:
@@ -241,10 +224,11 @@ class DescriptorNumpy:
             #NumPy
             values = np.array([row[column] for row in self.data if row[column] is not None])
             if values.size == 0:
-                typeModeResult[column] = (type(self.data[0][column]).__name__, None)
+                typeModeResultNp[column] = (type(self.data[0][column]).__name__, None)
             elif np.issubdtype(values.dtype, np.number):
-                typeModeResult[column] = (type(values[0]).__name__, float(np.bincount(values).argmax()))
+                typeModeResultNp[column] = (type(values[0]).__name__, float(np.bincount(values).argmax()))
             else:
-                typeModeResult[column] = (type(values[0]).__name__, str(np.bincount(values).argmax()))
+                unique, counts = np.unique(values, return_counts=True)
+                typeModeResultNp[column] = (type(values[0]).__name__, str(unique[np.argmax(counts)]))
 
-        return result # type: ignore
+        return typeModeResultNp
