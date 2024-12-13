@@ -97,7 +97,7 @@ class MarketAnalyzer:
 
         df = self.real_state_clean_data
        
-        neighborhood_stats = df.groupby("Neighborhood") .agg([ 
+        neighborhood_stats = df.groupby("Neighborhood") .agg([   # type: ignore
             pl.col("SalePrice").median().alias("median_price"),
             pl.col("SalePrice").mean().alias("mean_price"),
             pl.col("SalePrice").std().alias("std_dev_price"),
