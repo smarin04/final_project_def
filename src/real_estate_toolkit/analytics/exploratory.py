@@ -12,7 +12,7 @@ class MarketAnalyzer:
             data_path (str): Path to the Ames Housing dataset
         """
         self.data_path = data_path
-        self.real_state_data = pl.read_csv(data_path)
+        self.real_state_data = pl.read_csv(data_path, null_values="NA")
         self.real_state_clean_data = None
     
     def clean_data(self) -> None:
@@ -31,8 +31,8 @@ class MarketAnalyzer:
         """
         df = self.real_state_data
         
-        # Handle missing values
-        df = df.fill_null(strategy="mean")
+       
+        
         
         # Convert columns to appropriate data types
         for column in df.columns:
@@ -41,6 +41,7 @@ class MarketAnalyzer:
             elif df[column].dtype == pl.Float64 or df[column].dtype == pl.Int64:
                 df = df.with_columns([pl.col(column).cast(pl.Float64)])
         
+        df = df.fill_null(strategy="mean")
         self.real_state_clean_data = df
     
     def generate_price_distribution_analysis(self) -> pl.DataFrame:
@@ -95,14 +96,15 @@ class MarketAnalyzer:
             raise ValueError("Cleaned data is not available. Please run clean_data() first.")
 
         df = self.real_state_clean_data
-        neighborhood_stats = df.groupby("Neighborhood").agg([ # type: ignore
+       
+        neighborhood_stats = df.groupby("Neighborhood") .agg([ 
             pl.col("SalePrice").median().alias("median_price"),
             pl.col("SalePrice").mean().alias("mean_price"),
             pl.col("SalePrice").std().alias("std_dev_price"),
             pl.col("SalePrice").min().alias("min_price"),
             pl.col("SalePrice").max().alias("max_price")
         ])
-        
+    
         fig = px.box(df.to_pandas(), x="Neighborhood", y="SalePrice", title="Neighborhood Price Comparison")
         fig.write_html("src/real_estate_toolkit/analytics/outputs/neighborhood_price_comparison.html")
         
