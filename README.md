@@ -1,6 +1,7 @@
 # Real Estate Analysis Toolkit Project
 ## Virtual Environment Setup (with Poetry)
 ```bash
+poetry config virtualenvs.in-project true
 poetry install
 poetry shell
 python src/real_estate_toolkit/main.py
