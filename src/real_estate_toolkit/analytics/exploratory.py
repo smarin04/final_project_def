@@ -12,14 +12,12 @@ class MarketAnalyzer:
     def clean_data(self) -> None:
         df = self.real_state_data
 
-        #2.
         for column in df.columns:
             if df[column].dtype == pl.Utf8:
                 df = df.with_columns([pl.col(column).cast(pl.Categorical)])
             elif df[column].dtype == pl.Float64 or df[column].dtype == pl.Int64:
                 df = df.with_columns([pl.col(column).cast(pl.Float64)])
 
-        #1.
         df = df.fill_null(strategy="mean")
 
 

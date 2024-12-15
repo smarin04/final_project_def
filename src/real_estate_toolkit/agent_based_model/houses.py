@@ -39,7 +39,7 @@ class House:
 
         if self.quality_score is None:
             age = datetime.now().year - self.year_built
-            if age < 0 and self.area > 0 and self.bedrooms >= 0:                    #!
+            if age < 0 and self.area > 0 and self.bedrooms >= 0:
                 self.quality_score = QualityScore.EXCELLENT
             elif age < 0 and self.area > 0 and self.bedrooms >= 0:
                 self.quality_score = QualityScore.GOOD

@@ -1,12 +1,12 @@
 from typing import List, Dict, Any
 
-from sklearn.model_selection import train_test_split                                                                  #, cross_val_score, GridSearchCV
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.impute import SimpleImputer
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LinearRegression
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor                                         #!
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.metrics import (
     mean_squared_error,
     mean_absolute_error,
@@ -14,7 +14,7 @@ from sklearn.metrics import (
     mean_absolute_percentage_error
 )
 import polars as pl
-import os                                                                                                             #!
+import os
 
 
 
@@ -98,7 +98,7 @@ class HousePricePredictor:
             ]
         )
 
-        X_train, X_test, y_train, y_test = train_test_split(X.to_pandas(),                                            #!
+        X_train, X_test, y_train, y_test = train_test_split(X.to_pandas(),
                                                             y.to_pandas(),
                                                             test_size=0.2,
                                                             random_state=42)
@@ -148,7 +148,7 @@ class HousePricePredictor:
         pipeline = self.models[model_type]
 
         #Generate Predictions
-        predictions = pipeline.predict(self.test_data.to_pandas())                                                    #!
+        predictions = pipeline.predict(self.test_data.to_pandas())
 
 
 
@@ -164,7 +164,4 @@ class HousePricePredictor:
         submission_path = os.path.join(output_dir, "submission.csv")
         submission.write_csv(submission_path)
 
-
         return submission_path
-
-

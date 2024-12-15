@@ -35,14 +35,13 @@ class Simulation:
     saving_rate: float = 0.3
     interest_rate: float = 0.05
 
-    def __post_init__(self):                                                                              #!
+    def __post_init__(self):
         self.housing_market: Optional[HousingMarket] = None
         self.consumers: List[Consumer] = []
 
     def create_housing_market(self):
             houses = []
             for data in self.housing_market_data:
-#test_market_functionality
                 quality_score = QualityScore(max(1, min(5, int(data["overall_qual"]) // 2)))
                 house = House(
                     id=int(data["id"]),
@@ -54,7 +53,6 @@ class Simulation:
                     available=True
                 )
                 houses.append(house)
-#test_market_functionality
             self.housing_market = HousingMarket(houses)
 
     def create_consumers(self) -> None:

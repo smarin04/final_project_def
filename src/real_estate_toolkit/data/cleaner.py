@@ -6,9 +6,8 @@ class Cleaner:
     data: List[Dict[str, Any]]
 
     def snake_case(self, colName: str) -> str:
-        import re                                                       #!
+        import re
         colName = re.sub(r"(?<!^)(?=[A-Z])", "_", colName).lower()
-        # colName = re.sub(r"\s+"", "_", colName)
         return colName
 
     def rename_with_best_practices(self) -> None:

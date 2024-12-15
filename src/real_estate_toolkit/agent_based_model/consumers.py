@@ -1,8 +1,8 @@
 from enum import Enum, auto
 from dataclasses import dataclass
 from typing import Optional
-from real_estate_toolkit.agent_based_model.houses import House, QualityScore                #!
-from real_estate_toolkit.agent_based_model.house_market import HousingMarket                #!
+from real_estate_toolkit.agent_based_model.houses import House, QualityScore
+from real_estate_toolkit.agent_based_model.house_market import HousingMarket
 
 class Segment(Enum):
     FANCY = auto()

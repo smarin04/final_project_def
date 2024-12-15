@@ -1,5 +1,5 @@
 from typing import List, Optional, Callable
-from real_estate_toolkit.agent_based_model.houses import House, QualityScore        #!
+from real_estate_toolkit.agent_based_model.houses import House, QualityScore
 
 from enum import Enum
 class Segment(Enum):
@@ -48,7 +48,7 @@ class HousingMarket:
             house for house in self.houses
             if house.price <= max_price
             and house.quality_score.value == segment.value
-            ]                                                                       #!
+            ]
 
         if not filteredHouses:
             return None
