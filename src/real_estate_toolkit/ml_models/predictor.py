@@ -164,8 +164,7 @@ class HousePricePredictor:
         submission_path = os.path.join(output_dir, "submission.csv")
         submission.write_csv(submission_path)
 
-<<<<<<< HEAD
+
         return submission_path
-=======
-        return submission_path
->>>>>>> 3fe3c016108fa257b32570e6b6a32aace1e2f82d
+
+
