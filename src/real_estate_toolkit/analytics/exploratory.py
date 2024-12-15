@@ -2,6 +2,7 @@ from typing import List, Dict
 import polars as pl
 import plotly.express as px
 import plotly.graph_objects as go
+import os
 
 class MarketAnalyzer:
     def __init__(self, data_path: str):
@@ -38,8 +39,15 @@ class MarketAnalyzer:
             pl.col("SalePrice").max().alias("max")
         ])
 
+
+
+        output_dir = "src/real_estate_toolkit/analytics/outputs/"
+        os.makedirs(output_dir, exist_ok=True)
+
         fig = px.histogram(df.to_pandas(), x="SalePrice", title="Sale Price Distribution")
-        fig.write_html("src/real_estate_toolkit/analytics/outputs/sale_price_distribution.html")
+
+        fig_path = os.path.join(output_dir, "sale_price_distribution.html")
+        fig.write_html(fig_path)
 
         return price_statistics
 
@@ -57,8 +65,15 @@ class MarketAnalyzer:
             pl.col("SalePrice").max().alias("max_price")
         ])
 
+
+
+        output_dir = "src/real_estate_toolkit/analytics/outputs/"
+        os.makedirs(output_dir, exist_ok=True)
+
         fig = px.box(df.to_pandas(), x="Neighborhood", y="SalePrice", title="Neighborhood Price Comparison")
-        fig.write_html("src/real_estate_toolkit/analytics/outputs/neighborhood_price_comparison.html")
+
+        fig_path = os.path.join(output_dir, "neighborhood_price_comparison.html")
+        fig.write_html(fig_path)
 
         return neighborhood_stats
 
@@ -70,8 +85,15 @@ class MarketAnalyzer:
 
         correlation_matrix = df.to_pandas().corr()
 
+
+
+        output_dir = "src/real_estate_toolkit/analytics/outputs/"
+        os.makedirs(output_dir, exist_ok=True)
+
         fig = px.imshow(correlation_matrix, text_auto=True, title="Correlation Heatmap")
-        fig.write_html("src/real_estate_toolkit/analytics/outputs/correlation_heatmap.html")
+
+        fig_path = os.path.join(output_dir, "correlation_heatmap.html")
+        fig.write_html(fig_path)
 
     def create_scatter_plots(self) -> Dict[str, go.Figure]:
         if self.real_state_clean_data is None:
@@ -79,18 +101,26 @@ class MarketAnalyzer:
 
         df = self.real_state_clean_data.to_pandas()
 
+
+
+        output_dir = "src/real_estate_toolkit/analytics/outputs/"
+        os.makedirs(output_dir, exist_ok=True)
+
         figures = {}
 
         fig1 = px.scatter(df, x="GrLivArea", y="SalePrice", trendline="ols", title="House Price vs. Total Square Footage")
-        fig1.write_html("src/real_estate_toolkit/analytics/outputs/price_vs_square_footage.html")
+        fig1_path = os.path.join(output_dir, "price_vs_square_footage.html")
+        fig1.write_html(fig1_path)
         figures["price_vs_square_footage"] = fig1
 
         fig2 = px.scatter(df, x="YearBuilt", y="SalePrice", trendline="ols", title="Sale Price vs. Year Built")
-        fig2.write_html("src/real_estate_toolkit/analytics/outputs/price_vs_year_built.html")
+        fig2_path = os.path.join(output_dir, "price_vs_year_built.html")
+        fig2.write_html(fig2_path)
         figures["price_vs_year_built"] = fig2
 
         fig3 = px.scatter(df, x="OverallQual", y="SalePrice", trendline="ols", title="Overall Quality vs. Sale Price")
-        fig3.write_html("src/real_estate_toolkit/analytics/outputs/quality_vs_price.html")
+        fig3_path = os.path.join(output_dir, "quality_vs_price.html")
+        fig3.write_html(fig3_path)
         figures["quality_vs_price"] = fig3
 
         return figures
